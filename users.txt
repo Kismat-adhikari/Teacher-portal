@@ -1,0 +1,2 @@
+student,Kismat Adhikari,kismat@gmail.com,Kismat12@,12,SM31
+teacher,Canvas,canvas@gmail.com,canvas@gmail.com

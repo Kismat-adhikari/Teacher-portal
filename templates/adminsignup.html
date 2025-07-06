@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1c1c1c;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
+            padding: 2rem 1rem;
+        }
+
+        .admin-signup-container {
+            background: rgba(40, 40, 40, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(244, 100, 100, 0.2);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #f46464;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(244, 100, 100, 0.3);
+        }
+
+        .admin-badge {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #ffaa44;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(255, 170, 68, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 170, 68, 0.3);
+        }
+
+        .security-notice {
+            background: rgba(255, 170, 68, 0.1);
+            border: 1px solid rgba(255, 170, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: #ffaa44;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group.error input {
+            border-color: #f46464;
+            box-shadow: 0 0 10px rgba(244, 100, 100, 0.5);
+            background-color: rgba(244, 100, 100, 0.1);
+        }
+
+        .error-message {
+            color: #f46464;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+            padding: 0.25rem 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .admin-code-label {
+            color: #ffaa44;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #f46464;
+            box-shadow: 0 0 10px rgba(244, 100, 100, 0.3);
+            background-color: #333;
+        }
+
+        #admin_code:focus {
+            border-color: #ffaa44;
+            box-shadow: 0 0 10px rgba(255, 170, 68, 0.3);
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 45px !important;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .password-toggle:hover {
+            color: #f46464;
+        }
+
+        .password-toggle.active {
+            color: #f46464;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #f46464 0%, #e55555 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #e55555 0%, #d44444 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 100, 100, 0.4);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .form-footer a {
+            color: #f46464;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            color: #e55555;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .admin-signup-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-signup-container">
+        <h1>Admin Sign Up</h1>
+        <div class="admin-badge">🛡️ Administrative Access</div>
+        
+        <div class="security-notice">
+            <strong>⚠️ Security Notice:</strong> Admin registration requires a valid authorization code. Only authorized personnel should proceed.
+        </div>
+        
+        {% if error %}
+            <div class="form-group error">
+                <div class="error-message" style="display: block;">{{ error }}</div>
+            </div>
+        {% endif %}
+        
+        <form action="/adminsignup" method="post" id="adminSignupForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter admin username">
+            </div>
+            
+            <div class="form-group" id="emailGroup">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="Enter admin email">
+                <div class="error-message" id="emailError">This email is already registered</div>
+            </div>
+            
+            <div class="form-group" id="passwordGroup">
+                <label for="password">Password:</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required placeholder="Enter secure password">
+                    <span class="password-toggle" onclick="togglePassword('password', this)">👁</span>
+                </div>
+            </div>
+            
+            <div class="form-group" id="confirmPasswordGroup">
+                <label for="confirm_password">Confirm Password:</label>
+                <div class="password-container">
+                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
+                    <span class="password-toggle" onclick="togglePassword('confirm_password', this)">👁</span>
+                </div>
+                <div class="error-message" id="passwordError">Passwords don't match</div>
+            </div>
+            
+            <div class="form-group" id="adminCodeGroup">
+                <label for="admin_code" class="admin-code-label">Admin Code:</label>
+                <div class="password-container">
+                    <input type="password" id="admin_code" name="admin_code" required placeholder="Enter authorization code">
+                    <span class="password-toggle" onclick="togglePassword('admin_code', this)">👁</span>
+                </div>
+                <div class="error-message" id="adminCodeError">Invalid admin code</div>
+            </div>
+            
+            <button type="submit">Sign Up as Admin</button>
+        </form>
+        
+        <div class="form-footer">
+            <p>Already have an account? <a href="/login">Login here</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId, toggleElement) {
+            const passwordField = document.getElementById(fieldId);
+            const isPassword = passwordField.type === 'password';
+            
+            passwordField.type = isPassword ? 'text' : 'password';
+            toggleElement.innerHTML = isPassword ? '<span style="position: relative;">👁<span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #f46464; font-size: 1.2em;">⃠</span></span>' : '👁';
+            toggleElement.classList.toggle('active');
+        }
+
+        document.getElementById('adminSignupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            // Reset error states
+            clearErrors();
+            
+            let hasErrors = false;
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                showError('confirmPasswordGroup', 'passwordError');
+                hasErrors = true;
+            }
+            
+            if (!hasErrors) {
+                // Check if email already exists
+                fetch('/check-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'email=' + encodeURIComponent(email)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        showError('emailGroup', 'emailError');
+                    } else {
+                        // Submit the form normally
+                        e.target.removeEventListener('submit', arguments.callee);
+                        e.target.submit();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // If there's an error with the request, submit anyway
+                    e.target.removeEventListener('submit', arguments.callee);
+                    e.target.submit();
+                });
+            }
+        });
+        
+        function showError(groupId, errorId) {
+            document.getElementById(groupId).classList.add('error');
+            document.getElementById(errorId).style.display = 'block';
+        }
+        
+        function clearErrors() {
+            const errorGroups = document.querySelectorAll('.form-group.error');
+            const errorMessages = document.querySelectorAll('.error-message');
+            
+            errorGroups.forEach(group => group.classList.remove('error'));
+            errorMessages.forEach(message => message.style.display = 'none');
+        }
+        
+        // Clear errors when user starts typing
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            if (this.value === document.getElementById('password').value) {
+                document.getElementById('confirmPasswordGroup').classList.remove('error');
+                document.getElementById('passwordError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('email').addEventListener('input', function() {
+            document.getElementById('emailGroup').classList.remove('error');
+            document.getElementById('emailError').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

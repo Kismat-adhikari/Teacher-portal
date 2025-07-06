@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPasa - Responsive Navigation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sp-primary-color: #f46464;
+            --sp-primary-hover: #e55555;
+            --sp-bg-dark: #1c1c1c;
+            --sp-bg-darker: #161616;
+            --sp-text-white: #ffffff;
+            --sp-text-gray: #cccccc;
+            --sp-text-light-gray: #999999;
+            --sp-navbar-height: 70px;
+            --sp-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sp-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            transition: var(--sp-transition);
+        }
+
+        /* Ensure all content is pushed below navbar */
+        body > *:not(.sp-navbar-001):not(.sp-mobile-nav-003):not(.sp-modal-overlay-005) {
+            margin-top: var(--sp-navbar-height);
+        }
+
+        /* Navbar Container */
+        .sp-navbar-001 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--sp-bg-dark);
+            height: var(--sp-navbar-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: var(--sp-shadow);
+            z-index: 9999;
+            transition: var(--sp-transition);
+        }
+
+        .sp-navbar-001.sp-scrolled-002 {
+            height: 60px;
+            background-color: var(--sp-bg-darker);
+            box-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo */
+        .sp-logo-010 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--sp-text-white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .sp-logo-icon-011 {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--sp-primary-color), #ff6b6b);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .sp-logo-text-012 .sp-study-013 {
+            color: var(--sp-primary-color);
+        }
+
+        .sp-logo-text-012 .sp-pasa-014 {
+            color: var(--sp-text-white);
+        }
+
+        /* Desktop Navigation */
+        .sp-nav-links-020 {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .sp-nav-link-021 {
+            color: var(--sp-text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: var(--sp-transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .sp-nav-link-021:hover {
+            color: var(--sp-primary-color);
+            background-color: rgba(244, 100, 100, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .sp-nav-link-021.sp-active-022 {
+            color: var(--sp-primary-color);
+            background-color: rgba(244, 100, 100, 0.15);
+        }
+
+        .sp-nav-link-021 i {
+            font-size: 1.1rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        /* Hamburger Menu */
+        .sp-hamburger-030 {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 10001;
+        }
+
+        .sp-hamburger-030 span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--sp-text-white);
+            margin: 3px 0;
+            transition: var(--sp-transition);
+            border-radius: 3px;
+        }
+
+        .sp-hamburger-030.sp-hamburger-active-031 span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+            background-color: var(--sp-primary-color);
+        }
+
+        .sp-hamburger-030.sp-hamburger-active-031 span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .sp-hamburger-030.sp-hamburger-active-031 span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+            background-color: var(--sp-primary-color);
+        }
+
+        /* Mobile Navigation */
+        .sp-mobile-nav-003 {
+            position: fixed;
+            top: var(--sp-navbar-height);
+            left: 0;
+            right: 0;
+            background-color: var(--sp-bg-dark);
+            transform: translateY(-100%);
+            transition: var(--sp-transition);
+            box-shadow: var(--sp-shadow);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sp-mobile-nav-003.sp-mobile-nav-active-032 {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sp-mobile-nav-links-033 {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .sp-mobile-nav-links-033 .sp-nav-link-021 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            color: var(--sp-text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--sp-transition);
+        }
+
+        .sp-mobile-nav-links-033 .sp-nav-link-021:hover,
+        .sp-mobile-nav-links-033 .sp-nav-link-021.sp-active-022 {
+            color: var(--sp-primary-color);
+            background-color: rgba(244, 100, 100, 0.1);
+            padding-left: 2.5rem;
+        }
+
+        .sp-mobile-nav-links-033 .sp-nav-link-021 i {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Modal Styles */
+        .sp-modal-overlay-005 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--sp-transition);
+        }
+
+        .sp-modal-overlay-005.sp-modal-active-040 {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sp-modal-041 {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: var(--sp-transition);
+        }
+
+        .sp-modal-overlay-005.sp-modal-active-040 .sp-modal-041 {
+            transform: scale(1);
+        }
+
+        .sp-modal-header-042 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sp-modal-icon-043 {
+            width: 50px;
+            height: 50px;
+            background-color: var(--sp-primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .sp-modal-title-044 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--sp-bg-dark);
+            margin: 0;
+        }
+
+        .sp-modal-message-045 {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .sp-modal-buttons-046 {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .sp-modal-button-047 {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--sp-transition);
+            min-width: 80px;
+        }
+
+        .sp-modal-button-047.sp-cancel-048 {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .sp-modal-button-047.sp-cancel-048:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .sp-modal-button-047.sp-logout-049 {
+            background-color: var(--sp-primary-color);
+            color: white;
+        }
+
+        .sp-modal-button-047.sp-logout-049:hover {
+            background-color: var(--sp-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .sp-modal-button-047:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Loading spinner for logout button */
+        .sp-loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Demo content for testing */
+        .sp-demo-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sp-demo-content h1 {
+            color: var(--sp-bg-dark);
+            margin-bottom: 1rem;
+        }
+
+        .sp-demo-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sp-navbar-001 {
+                padding: 0 1rem;
+            }
+
+            .sp-nav-links-020 {
+                display: none;
+            }
+
+            .sp-hamburger-030 {
+                display: flex;
+            }
+
+            .sp-modal-041 {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .sp-modal-buttons-046 {
+                flex-direction: column;
+            }
+
+            .sp-modal-button-047 {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sp-logo-010 {
+                font-size: 1.2rem;
+            }
+
+            .sp-logo-icon-011 {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Body transition when mobile nav is open */
+        body.sp-nav-open-050 {
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="sp-navbar-001" id="sp-navbar-001">
+        <a href="/" class="sp-logo-010">
+            <div class="sp-logo-icon-011">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <span class="sp-logo-text-012">
+                <span class="sp-study-013">Study</span><span class="sp-pasa-014">Pasa</span>
+            </span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <ul class="sp-nav-links-020">
+            <!-- Notes section - Only visible to teachers/admins -->
+            <li class="sp-teacher-only" style="display: none;">
+                <a href="/notes" class="sp-nav-link-021" data-page="notes">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Notes</span>
+                </a>
+            </li>
+            
+            <!-- Home/Dashboard - Shows notes for students, admin panel for teachers -->
+            <li><a href="/" class="sp-nav-link-021" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a></li>
+            
+            <li><a href="/notices" class="sp-nav-link-021" data-page="notices">
+                <i class="fas fa-bullhorn"></i>
+                <span>Notices</span>
+            </a></li>
+            
+            <li><a href="/profile" class="sp-nav-link-021" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a></li>
+            
+            <li><a href="#logout" class="sp-nav-link-021" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a></li>
+        </ul>
+
+        <!-- Hamburger Menu -->
+        <div class="sp-hamburger-030" id="sp-hamburger-030">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <div class="sp-mobile-nav-003" id="sp-mobile-nav-003">
+        <ul class="sp-mobile-nav-links-033">
+            <!-- Notes section - Only visible to teachers/admins -->
+            <li class="sp-teacher-only" style="display: none;">
+                <a href="/notes" class="sp-nav-link-021" data-page="notes">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Notes</span>
+                </a>
+            </li>
+            
+            <!-- Home/Dashboard - Shows notes for students, admin panel for teachers -->
+            <li><a href="/" class="sp-nav-link-021" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a></li>
+            
+            <li><a href="/notices" class="sp-nav-link-021" data-page="notices">
+                <i class="fas fa-bullhorn"></i>
+                <span>Notices</span>
+            </a></li>
+            
+            <li><a href="/profile" class="sp-nav-link-021" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a></li>
+            
+            <li><a href="#logout" class="sp-nav-link-021" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a></li>
+        </ul>
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="sp-modal-overlay-005" id="sp-modal-overlay-005">
+        <div class="sp-modal-041">
+            <div class="sp-modal-header-042">
+                <div class="sp-modal-icon-043">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3 class="sp-modal-title-044">Confirm Logout</h3>
+            </div>
+            <p class="sp-modal-message-045">
+                Are you sure you want to log out? You will need to sign in again to access your account.
+            </p>
+            <div class="sp-modal-buttons-046">
+                <button class="sp-modal-button-047 sp-cancel-048" id="sp-cancel-logout-048">Cancel</button>
+                <button class="sp-modal-button-047 sp-logout-049" id="sp-confirm-logout-049">Logout</button>
+            </div>
+        </div>
+    </div>
+  
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const hamburger = document.getElementById('sp-hamburger-030');
+            const mobileNav = document.getElementById('sp-mobile-nav-003');
+            const navbar = document.getElementById('sp-navbar-001');
+            const body = document.body;
+            const allNavLinks = document.querySelectorAll('.sp-nav-link-021');
+            const logoutModal = document.getElementById('sp-modal-overlay-005');
+            const cancelLogout = document.getElementById('sp-cancel-logout-048');
+            const confirmLogout = document.getElementById('sp-confirm-logout-049');
+
+            // Toggle mobile navigation
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('sp-hamburger-active-031');
+                mobileNav.classList.toggle('sp-mobile-nav-active-032');
+                body.classList.toggle('sp-nav-open-050');
+            });
+
+            // Handle all navigation link clicks
+            allNavLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Only prevent default for logout links
+                    if (this.dataset.page === 'logout') {
+                        e.preventDefault();
+                        showLogoutModal();
+                    } else {
+                        // For regular navigation links, let the browser handle the navigation
+                        // Close mobile nav if it's open
+                        closeMobileNav();
+                    }
+                });
+            });
+
+            // Function to close mobile navigation
+            function closeMobileNav() {
+                hamburger.classList.remove('sp-hamburger-active-031');
+                mobileNav.classList.remove('sp-mobile-nav-active-032');
+                body.classList.remove('sp-nav-open-050');
+            }
+
+            // Show logout modal
+            function showLogoutModal() {
+                logoutModal.classList.add('sp-modal-active-040');
+                body.style.overflow = 'hidden';
+                closeMobileNav(); // Close mobile nav when showing modal
+            }
+
+            // Hide logout modal
+            function hideLogoutModal() {
+                logoutModal.classList.remove('sp-modal-active-040');
+                body.style.overflow = '';
+            }
+
+            // Cancel logout
+            cancelLogout.addEventListener('click', hideLogoutModal);
+
+            // Confirm logout - Enhanced Flask Integration
+            confirmLogout.addEventListener('click', async function() {
+                // Disable the button and show loading state
+                confirmLogout.disabled = true;
+                cancelLogout.disabled = true;
+                
+                // Store original button content
+                const originalContent = confirmLogout.innerHTML;
+                
+                // Show loading spinner
+                confirmLogout.innerHTML = '<span class="sp-loading-spinner"></span>Logging out...';
+                
+                try {
+                    // Redirect to Flask logout endpoint
+                    window.location.href = "/logout";
+                    
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    
+                    // Show error state
+                    confirmLogout.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                    
+                    // Reset button after showing error
+                    setTimeout(() => {
+                        confirmLogout.innerHTML = originalContent;
+                        confirmLogout.disabled = false;
+                        cancelLogout.disabled = false;
+                    }, 2000);
+                }
+            });
+
+            // Close modal when clicking outside
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === logoutModal) {
+                    hideLogoutModal();
+                }
+            });
+
+            // Function to set active navigation link based on current URL
+            function setActiveNavLink() {
+                // Remove active class from all links
+                allNavLinks.forEach(link => {
+                    link.classList.remove('sp-active-022');
+                });
+
+                // Get current pathname
+                const currentPath = window.location.pathname;
+                let activePage = '';
+
+                // Determine active page based on current URL
+                if (currentPath === '/' || currentPath === '/index.html') {
+                    activePage = 'dashboard';
+                } else if (currentPath.includes('notices')) {
+                    activePage = 'notices';
+                } else if (currentPath.includes('profile')) {
+                    activePage = 'profile';
+                } else if (currentPath.includes('notes')) {
+                    activePage = 'notes';
+                }
+
+                // Add active class to matching links
+                if (activePage) {
+                    allNavLinks.forEach(link => {
+                        if (link.dataset.page === activePage) {
+                            link.classList.add('sp-active-022');
+                        }
+                    });
+                }
+            }
+
+            // Function to check user type and show/hide elements
+            function setupUserTypeUI() {
+                // Check if user is teacher by making a request to check session
+                fetch('/api/user-type')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.user_type === 'teacher') {
+                            // Show teacher-only elements
+                            document.querySelectorAll('.sp-teacher-only').forEach(element => {
+                                element.style.display = 'block';
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Could not determine user type:', error);
+                        // If error, assume student (safer default)
+                    });
+            }
+
+            // Set initial active link on page load
+            setActiveNavLink();
+
+            // Setup user type specific UI elements
+            setupUserTypeUI();
+
+            // Update active link when browser back/forward buttons are used
+            window.addEventListener('popstate', setActiveNavLink);
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('sp-scrolled-002');
+                } else {
+                    navbar.classList.remove('sp-scrolled-002');
+                }
+            });
+
+            // Close mobile nav when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+                    closeMobileNav();
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeMobileNav();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && logoutModal.classList.contains('sp-modal-active-040')) {
+                    hideLogoutModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

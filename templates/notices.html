@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notices - StudyPasa</title>
+    {% include 'nav.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #1c1c1c;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #333333;
+            --theme-primary: #f46464;
+            --theme-secondary: #ff7575;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --text-muted: #888888;
+            --border-color: #404040;
+            --shadow-light: 0 4px 15px rgba(244, 100, 100, 0.1);
+            --shadow-medium: 0 8px 25px rgba(244, 100, 100, 0.15);
+            --shadow-heavy: 0 15px 35px rgba(244, 100, 100, 0.2);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-bg: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
+            --gradient-card: linear-gradient(145deg, #2a2a2a 0%, #1e1e1e 100%);
+            --gradient-button: linear-gradient(135deg, #f46464 0%, #ff7575 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--gradient-bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 70px); /* Ensure full height minus navbar */
+        }
+
+        .notices-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .notices-icon {
+            font-size: 60px;
+            color: var(--theme-primary);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(244, 100, 100, 0.5));
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .notices-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .notices-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 15px;
+            transition: var(--transition);
+            min-width: 300px;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 4px rgba(244, 100, 100, 0.1);
+        }
+
+        .search-box i {
+            color: var(--text-muted);
+            margin-right: 10px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .add-notice-btn {
+            padding: 12px 24px;
+            background: var(--gradient-button);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .add-notice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .filter-tab.active,
+        .filter-tab:hover {
+            background: var(--theme-primary);
+            color: white;
+            border-color: var(--theme-primary);
+        }
+
+        .notices-grid {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .notice-card {
+            background: var(--gradient-card);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .notice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .notice-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .notice-meta {
+            flex: 1;
+        }
+
+        .notice-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .notice-info {
+            display: flex;
+            gap: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .notice-priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .notice-content {
+            padding: 20px;
+        }
+
+        .notice-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .notice-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: var(--theme-primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--theme-primary);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .no-notices {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+
+        .no-notices i {
+            font-size: 4rem;
+            color: var(--theme-primary);
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .no-notices h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .no-notices p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .no-notices .btn {
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--gradient-button);
+            color: white;
+        }
+
+        .no-notices .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(244, 100, 100, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--gradient-card);
+            margin: 5vh auto;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            box-shadow: var(--shadow-heavy);
+            animation: modalSlideIn 0.3s ease-out;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h2 i {
+            color: var(--theme-primary);
+        }
+
+        .close {
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover {
+            color: var(--theme-primary);
+            background: rgba(244, 100, 100, 0.1);
+        }
+
+        .modal-content form {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .modal .form-group {
+            margin-bottom: 25px;
+        }
+
+        .modal .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .modal .form-input, .modal .form-textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .modal .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal .form-input:focus, .modal .form-textarea:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 3px rgba(244, 100, 100, 0.1);
+        }
+
+        .modal .priority-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .modal .priority-option {
+            position: relative;
+        }
+
+        .modal .priority-radio {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .modal .priority-label {
+            display: block;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            background: var(--bg-secondary);
+        }
+
+        .modal .priority-label.high {
+            color: #ff6b6b;
+        }
+
+        .modal .priority-label.medium {
+            color: #ffd93d;
+        }
+
+        .modal .priority-label.low {
+            color: #6bcf7f;
+        }
+
+        .modal .priority-radio:checked + .priority-label {
+            border-color: var(--theme-primary);
+            background: rgba(244, 100, 100, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .modal .form-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        /* Extra large screens */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1200px;
+                padding: 60px 20px;
+            }
+            
+            .notices-title {
+                font-size: 3rem;
+            }
+            
+            .notices-grid {
+                gap: 35px;
+            }
+        }
+
+        /* Large screens optimization */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .container {
+                padding: 50px 20px;
+            }
+        }
+
+        /* Extra large screens */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1200px;
+                padding: 50px 30px;
+            }
+            
+            .notices-title {
+                font-size: 3rem;
+            }
+            
+            .notices-icon {
+                font-size: 80px;
+            }
+        }
+
+        /* Large screens */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .container {
+                padding: 45px 25px;
+            }
+        }
+
+        /* Medium screens - tablets */
+        @media (min-width: 769px) and (max-width: 991px) {
+            .container {
+                padding: 35px 20px;
+            }
+            
+            .notices-title {
+                font-size: 2.2rem;
+            }
+            
+            .controls-section {
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .notices-title {
+                font-size: 2rem;
+            }
+
+            .controls-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .filter-tabs {
+                justify-content: center;
+            }
+
+            .notice-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .notice-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 2vh auto;
+                max-height: 96vh;
+            }
+
+            .modal-content form {
+                padding: 20px;
+            }
+
+            .modal-header {
+                padding: 20px;
+            }
+
+            .modal .priority-options {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .modal .form-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 70px; /* Maintain navbar spacing on mobile */
+            }
+            
+            .notices-title {
+                font-size: 1.8rem;
+            }
+
+            .notice-card {
+                margin: 0 -10px;
+            }
+
+            .filter-tabs {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 15px 10px;
+            }
+
+            .modal-content {
+                width: 98%;
+                margin: 1vh auto;
+                max-height: 98vh;
+                border-radius: 15px;
+            }
+
+            .modal-content form {
+                padding: 15px;
+            }
+
+            .modal-header {
+                padding: 15px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .close {
+                width: 35px;
+                height: 35px;
+                font-size: 24px;
+            }
+        }
+
+        /* Ensure content doesn't get too cramped on small screens */
+        @media (max-width: 320px) {
+            .container {
+                padding: 10px 8px;
+            }
+            
+            .notices-title {
+                font-size: 1.5rem;
+            }
+            
+            .search-box {
+                min-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="notices-header">
+            <i class="fas fa-bullhorn notices-icon"></i>
+            <h1 class="notices-title">Notices & Announcements</h1>
+            <p class="notices-subtitle">Stay updated with the latest announcements and important notices</p>
+        </div>
+
+        <div class="controls-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search notices...">
+            </div>
+            
+            {% if user_type == 'teacher' %}
+            <a href="/add-notice" class="add-notice-btn">
+                <i class="fas fa-plus"></i>
+                Add New Notice
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All Notices</button>
+            {% if user_type == 'student' %}
+            <button class="filter-tab" data-filter="myclass">My Class</button>
+            {% endif %}
+            <button class="filter-tab" data-filter="high">High Priority</button>
+            <button class="filter-tab" data-filter="medium">Medium Priority</button>
+            <button class="filter-tab" data-filter="low">Low Priority</button>
+        </div>
+
+        <div class="notices-grid" id="noticesContainer">
+            {% if notices %}
+                {% for notice in notices %}
+                <div class="notice-card" data-priority="{{ notice.priority }}" 
+                     data-class="{{ notice.class or '' }}" 
+                     data-section="{{ notice.section or '' }}"
+                     data-is-my-class="{% if user_type == 'student' and ((notice.class == student_class and notice.section == student_section) or (notice.class == student_class and notice.section == '') or (notice.class == '' and notice.section == student_section)) %}true{% else %}false{% endif %}">
+                    <div class="notice-header">
+                        <div class="notice-meta">
+                            <h2 class="notice-title">{{ notice.title }}</h2>
+                            <div class="notice-info">
+                                <span><i class="fas fa-user"></i> {{ notice.created_by }}</span>
+                                <span><i class="fas fa-calendar"></i> {{ notice.created_at[:10] }}</span>
+                                {% if notice.class and notice.section %}
+                                <span><i class="fas fa-graduation-cap"></i> Class {{ notice.class }} - Section {{ notice.section }}</span>
+                                {% elif notice.class %}
+                                <span><i class="fas fa-graduation-cap"></i> Class {{ notice.class }}</span>
+                                {% elif notice.section %}
+                                <span><i class="fas fa-users"></i> Section {{ notice.section }}</span>
+                                {% else %}
+                                <span><i class="fas fa-globe"></i> All Students</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="notice-priority priority-{{ notice.priority }}">{{ notice.priority.title() }}</span>
+                    </div>
+                    <div class="notice-content">
+                        <p class="notice-description">
+                            {{ notice.description }}
+                        </p>
+                        {% if user_type == 'teacher' %}
+                        <div class="notice-actions">
+                            <button class="btn btn-primary" 
+                                    data-notice-id="{{ notice.id }}"
+                                    data-notice-title="{{ notice.title }}"
+                                    data-notice-description="{{ notice.description }}"
+                                    data-notice-priority="{{ notice.priority }}"
+                                    data-notice-class="{{ notice.class or '' }}"
+                                    data-notice-section="{{ notice.section or '' }}"
+                                    onclick="editNoticeData(this)">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteNotice('{{ notice.id }}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-notices">
+                    <i class="fas fa-bullhorn"></i>
+                    <h3>No notices available</h3>
+                    <p>No notices have been posted yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Edit Notice Modal -->
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Notice</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="editNoticeForm" method="POST">
+                <div class="form-group">
+                    <label for="editTitle" class="form-label">
+                        <i class="fas fa-heading"></i> Notice Title
+                    </label>
+                    <input type="text" id="editTitle" name="title" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDescription" class="form-label">
+                        <i class="fas fa-align-left"></i> Description
+                    </label>
+                    <textarea id="editDescription" name="description" class="form-textarea" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editClass" class="form-label">
+                        <i class="fas fa-graduation-cap"></i> Target Class (Optional)
+                    </label>
+                    <select id="editClass" name="class" class="form-input" onchange="updateEditSectionOptions()">
+                        <option value="">All Classes</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editSection" class="form-label">
+                        <i class="fas fa-users"></i> Target Section (Optional)
+                    </label>
+                    <select id="editSection" name="section" class="form-input">
+                        <option value="">All Sections</option>
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                        <option value="D">Section D</option>
+                        <option value="SM31">Section SM31</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-exclamation-triangle"></i> Priority Level
+                    </label>
+                    <div class="priority-options">
+                        <div class="priority-option">
+                            <input type="radio" id="editHigh" name="priority" value="high" class="priority-radio">
+                            <label for="editHigh" class="priority-label high">
+                                <i class="fas fa-exclamation-circle"></i> High
+                            </label>
+                        </div>
+                        <div class="priority-option">
+                            <input type="radio" id="editMedium" name="priority" value="medium" class="priority-radio">
+                            <label for="editMedium" class="priority-label medium">
+                                <i class="fas fa-info-circle"></i> Medium
+                            </label>
+                        </div>
+                        <div class="priority-option">
+                            <input type="radio" id="editLow" name="priority" value="low" class="priority-radio">
+                            <label for="editLow" class="priority-label low">
+                                <i class="fas fa-check-circle"></i> Low
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Update Notice
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            const noticeCards = document.querySelectorAll('.notice-card');
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                noticeCards.forEach(card => {
+                    const title = card.querySelector('.notice-title').textContent.toLowerCase();
+                    const description = card.querySelector('.notice-description').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Filter functionality
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    noticeCards.forEach(card => {
+                        if (filter === 'all') {
+                            card.style.display = 'block';
+                        } else if (filter === 'myclass') {
+                            // Show only notices relevant to student's class/section
+                            const isMyClass = card.getAttribute('data-is-my-class');
+                            if (isMyClass === 'true') {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        } else {
+                            // Priority filtering
+                            const priority = card.getAttribute('data-priority');
+                            if (priority === filter) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+        });
+
+        function deleteNotice(noticeId) {
+            if (confirm('Are you sure you want to delete this notice?')) {
+                fetch(`/api/notices/${noticeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Reload the page to show updated notices
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting notice: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting notice');
+                });
+            }
+        }
+
+        function editNotice(id, title, description, priority, noticeClass, section) {
+            // Set the values in the modal
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editDescription').value = description;
+            document.getElementById('editClass').value = noticeClass || '';
+            
+            // Update section options first, then set the value
+            updateEditSectionOptions();
+            document.getElementById('editSection').value = section || '';
+            
+            document.querySelector(`input[name="priority"][value="${priority}"]`).checked = true;
+
+            // Show the modal
+            document.getElementById('editModal').style.display = 'block';
+
+            // Handle form submission
+            document.getElementById('editNoticeForm').onsubmit = function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch(`/api/notices/${id}`, {
+                    method: 'PUT',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Close the modal and reload the page
+                        closeEditModal();
+                        window.location.reload();
+                    } else {
+                        alert('Error updating notice: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating notice');
+                });
+            };
+        }
+
+        function editNoticeData(button) {
+            const id = button.getAttribute('data-notice-id');
+            const title = button.getAttribute('data-notice-title');
+            const description = button.getAttribute('data-notice-description');
+            const priority = button.getAttribute('data-notice-priority');
+            const noticeClass = button.getAttribute('data-notice-class');
+            const section = button.getAttribute('data-notice-section');
+            
+            editNotice(id, title, description, priority, noticeClass, section);
+        }
+
+        function updateEditSectionOptions() {
+            const classSelect = document.getElementById('editClass');
+            const sectionSelect = document.getElementById('editSection');
+            const selectedClass = classSelect.value;
+            const currentValue = sectionSelect.value; // Preserve current selection if possible
+            
+            // Clear current options except "All Sections"
+            sectionSelect.innerHTML = '<option value="">All Sections</option>';
+            
+            // Add section options (same for all classes)
+            const sections = ['A', 'B', 'C', 'D', 'SM31'];
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section;
+                option.textContent = `Section ${section}`;
+                if (option.value === currentValue) {
+                    option.selected = true;
+                }
+                sectionSelect.appendChild(option);
+            });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editNoticeForm').reset();
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

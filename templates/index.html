@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Portal</title>
+    {% include 'nav.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            border-left: 4px solid #1e7e34;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border-left: 4px solid #bd2130;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-top: 70px; /* Account for fixed navbar */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f46464 0%, #ff7575 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #f46464 0%, #d64545 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(244, 100, 100, 0.3);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 100, 100, 0.4);
+            background: linear-gradient(135deg, #ff7575 0%, #f46464 100%);
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(244, 100, 100, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: #f46464;
+            box-shadow: 0 0 0 3px rgba(244, 100, 100, 0.1);
+        }
+
+        .search-box i {
+            color: #f46464;
+            margin-right: 0.8rem;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 1rem;
+            width: 300px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .notes-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: linear-gradient(135deg, #f46464 0%, #d64545 100%);
+            color: white;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .note-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(244, 100, 100, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f46464 0%, #ff7575 100%);
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(244, 100, 100, 0.2);
+            border-color: rgba(244, 100, 100, 0.4);
+        }
+
+        .note-header {
+            margin-bottom: 1rem;
+        }
+
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .note-uploader {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #f46464;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .note-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .note-section {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(244, 100, 100, 0.1);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #f46464;
+            border: 1px solid rgba(244, 100, 100, 0.2);
+        }
+
+        .note-section i {
+            color: #f46464;
+        }
+
+        .note-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .note-subject {
+            color: #f46464;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(244, 100, 100, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            display: inline-block;
+            border: 1px solid rgba(244, 100, 100, 0.2);
+        }
+
+        .note-content {
+            margin-top: 1rem;
+        }
+
+        .note-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .note-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #f46464 0%, #d64545 100%);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #ff7575 0%, #f46464 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(244, 100, 100, 0.3);
+        }
+
+        .edit-btn {
+            background: rgba(244, 100, 100, 0.2);
+            color: #f46464;
+            border: 1px solid rgba(244, 100, 100, 0.3);
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn:hover {
+            background: rgba(244, 100, 100, 0.3);
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            background: rgba(220, 38, 127, 0.2);
+            color: #dc267f;
+            border: 1px solid rgba(220, 38, 127, 0.3);
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn:hover {
+            background: rgba(220, 38, 127, 0.3);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #f46464;
+            margin-bottom: 1rem;
+        }
+
+        .empty-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+       
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1c1c1c 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(244, 100, 100, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header i {
+            color: #dc267f;
+            font-size: 1.5rem;
+        }
+
+        .modal-header h3 {
+            color: #ffffff;
+            font-size: 1.3rem;
+        }
+
+        .modal-body p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #dc267f 0%, #b21e5f 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-delete:hover {
+            background: linear-gradient(135deg, #e63890 0%, #dc267f 100%);
+            transform: translateY(-1px);
+        }
+
+        /* Edit Modal Styles */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .edit-modal-content {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1c1c1c 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(244, 100, 100, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(244, 100, 100, 0.2);
+        }
+
+        .edit-modal-title {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .edit-modal-close {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-modal-close:hover {
+            color: #f46464;
+            transform: scale(1.1);
+        }
+
+        .edit-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .edit-form-group input,
+        .edit-form-group textarea,
+        .edit-form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(244, 100, 100, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-form-group input:focus,
+        .edit-form-group textarea:focus,
+        .edit-form-group select:focus {
+            border-color: #f46464;
+            box-shadow: 0 0 0 2px rgba(244, 100, 100, 0.1);
+            outline: none;
+        }
+
+        .edit-form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .edit-modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .edit-modal-buttons button {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-modal-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .edit-modal-save {
+            background: linear-gradient(135deg, #f46464 0%, #ff7575 100%);
+            color: white;
+            border: none;
+        }
+
+        .edit-modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .edit-modal-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 100, 100, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .note-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                margin: 1rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .note-card {
+                padding: 1rem;
+            }
+
+            .note-actions {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>EduNotes Portal</h1>
+            {% if user_type == 'teacher' %}
+            <p>Send your students their respective notes for selective subjects.</p>
+            {% else %}
+            <p>Get access to your notes uploaded by your respective teachers.</p>
+            {% endif %}
+        </div>
+
+        <div class="actions-bar">
+            {% if user_type == 'teacher' %}
+            <a href="{{ url_for('notes_page') }}" class="upload-button">
+                <i class="fas fa-file-upload"></i> Upload New Notes
+            </a>
+            {% endif %}
+            
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search notes...">
+            </div>
+        </div>
+
+        <div class="notes-section">
+            <div class="section-header">
+                <h2>Available Notes</h2>
+                <!-- <div class="filter-options">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="recent">Recent</button>
+                </div> -->
+            </div>
+            
+            <div id="notes-container" class="notes-grid"></div>
+        </div>
+
+        
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas"></i>
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="edit-modal">
+        <div class="edit-modal-content">
+            <div class="edit-modal-header">
+                <h3 class="edit-modal-title">Edit Note</h3>
+                <span class="edit-modal-close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="edit-form-group">
+                <label for="editTitle">Title</label>
+                <input type="text" id="editTitle" required>
+            </div>
+            <div class="edit-form-group">
+                <label for="editDescription">Description</label>
+                <textarea id="editDescription" required></textarea>
+            </div>
+            <div class="edit-form-group">
+                <label for="editSubject">Subject</label>
+                <select id="editSubject" required>
+                    <option value="">Select a subject</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Computer">Computer</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Social">Social</option>
+                    <option value="Nepali">Nepali</option>
+                </select>
+            </div>
+            <div class="edit-form-group">
+                <label for="editSection">Section</label>
+                <select id="editSection" required>
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                    <option value="C">Section C</option>
+                </select>
+            </div>
+            <div class="edit-form-group">
+                <label for="editPdfFile">Update File (Optional)</label>
+                <input type="file" id="editPdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx">
+            </div>
+            <div class="edit-modal-buttons">
+                <button class="edit-modal-cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="edit-modal-save" onclick="saveEditedNote()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Confirm Delete</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this note? This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user_type = "{{ user_type }}";
+        let noteToDelete = null;
+        let currentNoteId = null;
+        
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function openEditModal(noteId, title, description, subject, section) {
+            currentNoteId = noteId;
+            document.getElementById('editTitle').value = title.trim();
+            document.getElementById('editDescription').value = description.trim();
+            document.getElementById('editSubject').value = subject.trim();
+            document.getElementById('editSection').value = section.trim();
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentNoteId = null;
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const icon = toast.querySelector('.fas');
+
+            toast.className = 'toast';
+            icon.className = 'fas';
+
+            if (type === 'success') {
+                toast.classList.add('success');
+                icon.classList.add('fa-check-circle');
+            } else {
+                toast.classList.add('error');
+                icon.classList.add('fa-exclamation-circle');
+            }
+
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function saveEditedNote() {
+            const formData = new FormData();
+            formData.append('title', document.getElementById('editTitle').value);
+            formData.append('description', document.getElementById('editDescription').value);
+            formData.append('subject', document.getElementById('editSubject').value);
+            formData.append('section', document.getElementById('editSection').value);
+
+            const editFileInput = document.getElementById('editPdfFile');
+            if (editFileInput.files.length > 0) {
+                formData.append('pdf_file', editFileInput.files[0]);
+            }
+
+            fetch(`/api/notes/${currentNoteId}`, {
+                method: 'PUT',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, 'error');
+                } else {
+                    showToast('Note updated successfully.', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Unable to update note. Please try again.', 'error');
+            });
+
+            closeEditModal();
+        }
+
+        function showDeleteModal(id) {
+            noteToDelete = id;
+            document.getElementById('deleteModal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('deleteModal').classList.add('show');
+            }, 10);
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('deleteModal').style.display = 'none';
+                noteToDelete = null;
+            }, 300);
+        }
+
+        function confirmDelete() {
+            if (noteToDelete) {
+                fetch(`/api/notes/${noteToDelete}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        throw new Error('Failed to delete note');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            closeDeleteModal();
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const noteCards = document.querySelectorAll('.note-card');
+            
+            noteCards.forEach(card => {
+                const title = card.querySelector('.note-title').textContent.toLowerCase();
+                const description = card.querySelector('.note-description').textContent.toLowerCase();
+                const uploader = card.querySelector('.note-uploader').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm) || uploader.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                // In a real app, you would apply actual filtering logic here
+                // For now, we'll just simulate it
+                if (filter === 'recent') {
+                    alert('In a real application, this would show only recent notes');
+                }
+            });
+        });
+
+        // Fetch and display notes
+        fetch('/api/notes')
+            .then(response => response.json())
+            .then(notes => {
+                const container = document.getElementById('notes-container');
+                
+                if (notes.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="empty-message">No notes available yet.</div>
+                            ${user_type === 'teacher' ? 
+                                `<a href="{{ url_for('notes_page') }}" class="upload-button">
+                                    <i class="fas fa-file-upload"></i> Upload Your First Note
+                                </a>` : ''}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = '';
+                notes.forEach(note => {
+                    const noteCard = document.createElement('div');
+                    noteCard.className = 'note-card';
+                    noteCard.innerHTML = `
+                        <div class="note-header">
+                            <div class="note-meta">
+                                <div class="note-info">
+                                    <span class="note-subject">${note.subject || 'No Subject'}</span>
+                                    <span class="note-section">Section ${note.section || 'N/A'}</span>
+                                    <span class="note-date">${formatDate(note.uploaded_at)}</span>
+                                </div>
+                                <div class="note-uploader">Uploaded by ${note.uploaded_by}</div>
+                            </div>
+                            <div class="note-title">${note.title}</div>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-description">${note.description}</div>
+                            <div class="note-actions">
+                                <a href="/uploads/${note.filename}" target="_blank" class="download-btn">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                ${user_type === 'teacher' ? 
+                                    `<button onclick="openEditModal('${note.id}', '${note.title.replace(/'/g, "\\'")}',' ${note.description.replace(/'/g, "\\'")}',' ${note.subject.replace(/'/g, "\\'")}',' ${note.section}')" class="edit-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="showDeleteModal('${note.id}')" class="delete-btn">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(noteCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('notes-container').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="empty-message">Error loading notes. Please try again later.</div>
+                    </div>
+                `;
+            });
+    </script>
+</body>
+</html>

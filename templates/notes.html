@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'nav.html' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Upload Notes</title>
+
+    <style>
+        :root {
+            --bg-primary: #1c1c1c;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #333333;
+            --theme-primary: #f46464;
+            --theme-secondary: #ff7575;
+            --theme-tertiary: #ff8585;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --text-muted: #888888;
+            --border-color: #404040;
+            --shadow-light: 0 4px 15px rgba(244, 100, 100, 0.1);
+            --shadow-medium: 0 8px 25px rgba(244, 100, 100, 0.15);
+            --shadow-heavy: 0 15px 35px rgba(244, 100, 100, 0.2);
+            --glow: 0 0 20px rgba(244, 100, 100, 0.3);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-bg: linear-gradient(135deg, #1c1c1c 0%, #2a2a2a 100%);
+            --gradient-card: linear-gradient(145deg, #2a2a2a 0%, #1e1e1e 100%);
+            --gradient-button: linear-gradient(135deg, #f46464 0%, #ff7575 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--gradient-bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 20%, rgba(244, 100, 100, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(244, 100, 100, 0.02) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 60%, rgba(255, 117, 117, 0.02) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 70px); /* Ensure full height minus navbar */
+        }
+        .home-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--gradient-button);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+        }
+
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        /* Note card and grid styles */
+        .section-title {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .note-card {
+            background: var(--gradient-card);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .note-card h3 {
+            color: var(--theme-primary);
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+
+        .note-card p {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .download-button,
+        .edit-button,
+        .delete-button {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .download-button {
+            background: var(--theme-primary);
+            color: white;
+        }
+
+        .edit-button {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .delete-button {
+            background: #ff4444;
+            color: white;
+        }
+
+        .download-button:hover,
+        .edit-button:hover,
+        .delete-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(244, 100, 100, 0.5));
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-container {
+            background: var(--gradient-card);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-button);
+            opacity: 0.8;
+        }
+        
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-heavy);
+        }
+        
+        .form-group {
+            margin-bottom: 35px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        
+        label::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--theme-primary);
+            border-radius: 1px;
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            transition: var(--transition);
+            outline: none;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 4px rgba(244, 100, 100, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        textarea {
+            height: 140px;
+            resize: vertical;
+            font-family: inherit;
+            min-height: 140px;
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--theme-primary) var(--bg-secondary);
+        }
+        
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        textarea::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+        
+        textarea::-webkit-scrollbar-thumb {
+            background: var(--theme-primary);
+            border-radius: 4px;
+        }
+
+        /* Updated home button styles */
+        .home-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            background: var(--gradient-button);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+            margin: 30px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+
+        .home-button:hover::before {
+            left: 100%;
+        }
+
+        /* Safety margins and minimum heights */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 70px); /* Ensure full height minus navbar */
+        }
+
+        /* Ensure content doesn't get too cramped on small screens */
+        @media (max-width: 320px) {
+            .container {
+                padding: 10px 8px;
+            }
+        }
+
+        /* Extra large screens */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1100px;
+                padding: 60px 20px;
+            }
+        }
+
+        /* Large screens optimization */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .container {
+                padding: 50px 20px;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .home-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                margin: 20px auto;
+            }
+        }
+        .file-upload {
+            position: relative;
+            margin-top: 12px;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-upload-label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 100, 100, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--theme-primary);
+            background: rgba(244, 100, 100, 0.05);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .file-upload-label:hover::before {
+            left: 100%;
+        }
+        
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--theme-primary);
+            transition: var(--transition);
+        }
+        
+        .file-upload-label:hover .file-upload-icon {
+            transform: scale(1.1);
+        }
+        
+        .file-upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .file-upload-subtext {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        
+        .section-selector {
+            position: relative;
+        }
+        
+        select {
+            appearance: none;
+            padding-right: 50px;
+            cursor: pointer;
+        }
+        
+        .section-selector::after {
+            content: "▼";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--theme-primary);
+            font-size: 14px;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        
+        .section-selector:hover::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        button {
+            background: var(--gradient-button);
+            color: white;
+            padding: 18px 32px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: var(--transition);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 20px;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--glow);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 30px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 10px 0;
+        }
+        
+        .back-link:hover {
+            color: var(--theme-primary);
+            transform: translateX(-5px);
+        }
+        
+        .back-link::before {
+            content: "←";
+            margin-right: 8px;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        
+        .back-link:hover::before {
+            transform: translateX(-3px);
+        }
+        
+        /* File selected state */
+        .file-selected .file-upload-label {
+            border-color: var(--theme-primary);
+            background: rgba(244, 100, 100, 0.1);
+        }
+        
+        .file-selected .file-upload-icon {
+            color: var(--theme-secondary);
+        }
+        
+        .file-selected .file-upload-text {
+            color: var(--theme-primary);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .form-container {
+                padding: 30px 25px;
+                border-radius: 16px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header-icon {
+                font-size: 40px;
+            }
+            
+            .file-upload-label {
+                padding: 30px 15px;
+            }
+            
+            .file-upload-icon {
+                font-size: 36px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--gradient-card);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 700px;
+            position: relative;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .close-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .close-button:hover {
+            color: var(--theme-primary);
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .edit-form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .cancel-button {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+        }
+
+        .cancel-button:hover {
+            background: var(--bg-tertiary);
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-file-upload header-icon"></i>
+            <h1>Notes Management</h1>
+            <p class="subtitle">Upload and manage educational materials</p>
+        </div>
+        
+        <!-- Upload Form -->
+        <form action="/api/notes" method="POST" enctype="multipart/form-data" class="form-container">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter note title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Enter note description" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject" required>
+                    <option value="">Select a subject</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Computer">Computer</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Social">Social</option>
+                    <option value="Nepali">Nepali</option>
+                </select>
+            </div>
+            
+            <div class="form-group section-selector">
+                <label for="section">Section</label>
+                <select id="section" name="section" required>
+                    <option value="">Select a section</option>
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                    <option value="C">Section C</option>
+                    <option value="D">Section D</option>
+                    <option value="SM31">Section SM31</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="pdf_file">Upload File</label>
+                <div class="file-upload">
+                    <label class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                        <span class="file-upload-text">Drag & drop your file here</span>
+                        <span class="file-upload-subtext">or click to browse from your device</span>
+                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf,.doc,.docx,.ppt,.pptx" required>
+                    </label>
+                    <div id="file-info" class="file-info"></div>
+                </div>
+            </div>
+            
+            <button type="submit">Upload Note</button>
+        </form>
+
+        <!-- Notes Display Section -->
+        <h2 class="section-title">Uploaded Notes</h2>
+        <div id="notesContainer" class="notes-grid"></div>
+        
+        <a href="/" class="home-button">
+            <i class="fas fa-home"></i>
+            Back to Home
+        </a>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('pdf_file');
+            const fileUpload = document.querySelector('.file-upload');
+            const fileText = document.querySelector('.file-upload-text');
+            const fileSubtext = document.querySelector('.file-upload-subtext');
+            const editModal = document.getElementById('editModal');
+            let currentNoteId = null;
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const fileName = this.files[0].name;
+                    const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+                    
+                    fileText.textContent = fileName;
+                    fileSubtext.textContent = `File size: ${fileSize} MB`;
+                    fileUpload.classList.add('file-selected');
+                } else {
+                    fileText.textContent = 'Drag & drop your file here';
+                    fileSubtext.textContent = 'or click to browse from your device';
+                    fileUpload.classList.remove('file-selected');
+                }
+            });
+            
+            // Enhanced drag and drop
+            const fileLabel = document.querySelector('.file-upload-label');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight(e) {
+                fileLabel.style.borderColor = 'var(--theme-primary)';
+                fileLabel.style.background = 'rgba(244, 100, 100, 0.1)';
+                fileLabel.style.transform = 'translateY(-3px)';
+            }
+            
+            function unhighlight(e) {
+                fileLabel.style.borderColor = 'var(--border-color)';
+                fileLabel.style.background = 'var(--bg-secondary)';
+                fileLabel.style.transform = 'translateY(0)';
+            }
+            
+            fileLabel.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                fileInput.files = files;
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(event);
+            }
+            
+            // Form validation enhancement
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() === '') {
+                        this.style.borderColor = '#ff6b6b';
+                    } else {
+                        this.style.borderColor = 'var(--theme-primary)';
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.style.borderColor = 'var(--theme-primary)';
+                    }
+                });
+            });
+
+            // Function to open edit modal
+            window.openEditModal = function(noteId, title, description, subject, section) {
+                currentNoteId = noteId;
+                document.getElementById('editTitle').value = title;
+                document.getElementById('editDescription').value = description;
+                document.getElementById('editSubject').value = subject;
+                document.getElementById('editSection').value = section;
+                editModal.style.display = 'block';
+            }
+
+            // Function to close edit modal
+            window.closeEditModal = function() {
+                editModal.style.display = 'none';
+            }
+
+            // Function to save edited note
+            window.saveEditedNote = function() {
+                const formData = new FormData();
+                formData.append('title', document.getElementById('editTitle').value);
+                formData.append('description', document.getElementById('editDescription').value);
+                formData.append('subject', document.getElementById('editSubject').value);
+                formData.append('section', document.getElementById('editSection').value);
+
+                const editFileInput = document.getElementById('editPdfFile');
+                if (editFileInput.files.length > 0) {
+                    formData.append('pdf_file', editFileInput.files[0]);
+                }
+
+                fetch(`/api/notes/${currentNoteId}`, {
+                    method: 'PUT',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert('Note updated successfully!');
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the note.');
+                });
+
+                closeEditModal();
+            }
+
+            // Function to delete note
+            window.deleteNote = function(noteId) {
+                if (confirm('Are you sure you want to delete this note?')) {
+                    fetch(`/api/notes/${noteId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            alert('Note deleted successfully!');
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the note.');
+                    });
+                }
+            }
+        });
+    </script>
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEditModal()">&times;</span>
+            <h2 class="modal-title">Edit Note</h2>
+            <div class="edit-form-group">
+                <label for="editTitle">Title</label>
+                <input type="text" id="editTitle" required>
+            </div>
+            <div class="edit-form-group">
+                <label for="editDescription">Description</label>
+                <textarea id="editDescription" required></textarea>
+            </div>
+            <div class="edit-form-group">
+                <label for="editSubject">Subject</label>
+                <select id="editSubject" required>
+                    <option value="">Select a subject</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Computer">Computer</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Social">Social</option>
+                    <option value="Nepali">Nepali</option>
+                </select>
+            </div>
+            <div class="edit-form-group">
+                <label for="editSection">Section</label>
+                <select id="editSection" required>
+                    <option value="A">Section A</option>
+                    <option value="B">Section B</option>
+                    <option value="C">Section C</option>
+                    <option value="D">Section D</option>
+                    <option value="SM31">Section SM31</option>
+                </select>
+            </div>
+            <div class="edit-form-group">
+                <label for="editPdfFile">Update File (Optional)</label>
+                <div class="file-upload">
+                    <label class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                        <span class="file-upload-text">Click to update file</span>
+                        <input type="file" id="editPdfFile" accept=".pdf,.doc,.docx,.ppt,.pptx">
+                    </label>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="cancel-button" onclick="closeEditModal()">Cancel</button>
+                <button type="button" onclick="saveEditedNote()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to display notes with edit and delete buttons
+        function displayNotes(notes) {
+            const notesContainer = document.getElementById('notesContainer');
+            notesContainer.innerHTML = '';
+
+            notes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'note-card';
+                noteElement.innerHTML = `
+                    <h3>${note.title}</h3>
+                    <p>${note.description}</p>
+                    <p><strong>Subject:</strong> ${note.subject}</p>
+                    <p><strong>Section:</strong> ${note.section}</p>
+                    <p><strong>Uploaded by:</strong> ${note.uploaded_by}</p>
+                    <p><strong>Uploaded at:</strong> ${new Date(note.uploaded_at).toLocaleString()}</p>
+                    <div class="note-actions">
+                        <a href="/uploads/${note.filename}" target="_blank" class="download-button">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        <button onclick="openEditModal('${note.id}', '${note.title}', '${note.description}', '${note.subject}', '${note.section}')" class="edit-button">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="deleteNote('${note.id}')" class="delete-button">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                `;
+                notesContainer.appendChild(noteElement);
+            });
+        }
+
+        // Fetch and display notes when the page loads
+        fetch('/api/notes')
+            .then(response => response.json())
+            .then(notes => displayNotes(notes))
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
