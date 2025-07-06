@@ -431,26 +431,41 @@
 
         <!-- Desktop Navigation -->
         <ul class="sp-nav-links-020">
-            <!-- Notes section - Only visible to teachers/admins -->
+            <!-- Notes section - Main dashboard link -->
+            <li><a href="/" class="sp-nav-link-021" data-page="notes">
+                <i class="fas fa-sticky-note"></i>
+                <span>Notes</span>
+            </a></li>
+            
+            <!-- Home - Admin panel for teachers -->
             <li class="sp-teacher-only" style="display: none;">
-                <a href="/notes" class="sp-nav-link-021" data-page="notes">
-                    <i class="fas fa-sticky-note"></i>
-                    <span>Notes</span>
+                <a href="https://studypasa.com/welcome" class="sp-nav-link-021" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
                 </a>
             </li>
-            
-            <!-- Home/Dashboard - Shows notes for students, admin panel for teachers -->
-            <li><a href="/" class="sp-nav-link-021" data-page="dashboard">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a></li>
             
             <li><a href="/notices" class="sp-nav-link-021" data-page="notices">
                 <i class="fas fa-bullhorn"></i>
                 <span>Notices</span>
             </a></li>
             
-            <li><a href="/profile" class="sp-nav-link-021" data-page="profile">
+            <li><a href="https://studypasa.com/testgen" class="sp-nav-link-021" data-page="mocktest">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Mock Test</span>
+            </a></li>
+            
+            <li><a href="https://studypasa.com/STUDYPASA" class="sp-nav-link-021" data-page="chatbot">
+                <i class="fas fa-robot"></i>
+                <span>Chatbot</span>
+            </a></li>
+            
+            <li><a href="https://studypasa.com/videos" class="sp-nav-link-021" data-page="videos">
+                <i class="fas fa-play-circle"></i>
+                <span>Videos</span>
+            </a></li>
+            
+            <li><a href="https://studypasa.com/profile" class="sp-nav-link-021" data-page="profile">
                 <i class="fas fa-user"></i>
                 <span>Profile</span>
             </a></li>
@@ -472,26 +487,41 @@
     <!-- Mobile Navigation -->
     <div class="sp-mobile-nav-003" id="sp-mobile-nav-003">
         <ul class="sp-mobile-nav-links-033">
-            <!-- Notes section - Only visible to teachers/admins -->
+            <!-- Notes section - Main dashboard link -->
+            <li><a href="/" class="sp-nav-link-021" data-page="notes">
+                <i class="fas fa-sticky-note"></i>
+                <span>Notes</span>
+            </a></li>
+            
+            <!-- Home - Admin panel for teachers -->
             <li class="sp-teacher-only" style="display: none;">
-                <a href="/notes" class="sp-nav-link-021" data-page="notes">
-                    <i class="fas fa-sticky-note"></i>
-                    <span>Notes</span>
+                <a href="https://studypasa.com/welcome" class="sp-nav-link-021" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
                 </a>
             </li>
-            
-            <!-- Home/Dashboard - Shows notes for students, admin panel for teachers -->
-            <li><a href="/" class="sp-nav-link-021" data-page="dashboard">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a></li>
             
             <li><a href="/notices" class="sp-nav-link-021" data-page="notices">
                 <i class="fas fa-bullhorn"></i>
                 <span>Notices</span>
             </a></li>
             
-            <li><a href="/profile" class="sp-nav-link-021" data-page="profile">
+            <li><a href="https://studypasa.com/testgen" class="sp-nav-link-021" data-page="mocktest">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Mock Test</span>
+            </a></li>
+            
+            <li><a href="https://studypasa.com/STUDYPASA" class="sp-nav-link-021" data-page="chatbot">
+                <i class="fas fa-robot"></i>
+                <span>Chatbot</span>
+            </a></li>
+            
+            <li><a href="https://studypasa.com/videos" class="sp-nav-link-021" data-page="videos">
+                <i class="fas fa-play-circle"></i>
+                <span>Videos</span>
+            </a></li>
+            
+            <li><a href="https://studypasa.com/profile" class="sp-nav-link-021" data-page="profile">
                 <i class="fas fa-user"></i>
                 <span>Profile</span>
             </a></li>
@@ -631,11 +661,19 @@
 
                 // Determine active page based on current URL
                 if (currentPath === '/' || currentPath === '/index.html') {
-                    activePage = 'dashboard';
+                    activePage = 'notes';  // Homepage shows notes, so highlight Notes
                 } else if (currentPath.includes('notices')) {
                     activePage = 'notices';
-                } else if (currentPath.includes('profile')) {
+                } else if (currentPath.includes('profile') || window.location.href.includes('studypasa.com/profile')) {
                     activePage = 'profile';
+                } else if (currentPath.includes('welcome') || window.location.href.includes('studypasa.com/welcome')) {
+                    activePage = 'home';
+                } else if (currentPath.includes('testgen') || window.location.href.includes('studypasa.com/testgen')) {
+                    activePage = 'mocktest';
+                } else if (currentPath.includes('STUDYPASA') || window.location.href.includes('studypasa.com/STUDYPASA')) {
+                    activePage = 'chatbot';
+                } else if (currentPath.includes('videos') || window.location.href.includes('studypasa.com/videos')) {
+                    activePage = 'videos';
                 } else if (currentPath.includes('notes')) {
                     activePage = 'notes';
                 }
