@@ -428,7 +428,7 @@ def edit_note(note_id):
         notes[note_index]['subject'] = request.form.get('subject', notes[note_index]['subject'])
         notes[note_index]['section'] = request.form.get('section', notes[note_index]['section'])
         
-        # Handle file update if new file is uploaded
+        # Handle file update if new file is uploaded (optional)
         if 'pdf_file' in request.files:
             file = request.files['pdf_file']
             if file.filename != '':
@@ -451,8 +451,6 @@ def edit_note(note_id):
                 file.save(file_path)
                 file.close()
                 notes[note_index]['filename'] = filename
-        else:
-            return jsonify({"error": "No file uploaded"}), 400
         
         # Update the notes.json file
         with open(NOTES_FILE, 'w') as f:

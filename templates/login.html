@@ -151,6 +151,11 @@
             font-size: 1.1rem;
             transition: color 0.3s ease;
             user-select: none;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .password-toggle:hover {
@@ -161,6 +166,29 @@
             color: #f46464;
         }
 
+        .eye-icon {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            .password-toggle {
+                right: 12px;
+                width: 24px;
+                height: 24px;
+            }
+            
+            .eye-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .password-container input {
+                padding-right: 50px !important;
+            }
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 margin: 1rem;
@@ -169,6 +197,14 @@
             
             h1 {
                 font-size: 1.5rem;
+            }
+            
+            .password-container input {
+                padding-right: 50px !important;
+            }
+            
+            .password-toggle {
+                right: 12px;
             }
         }
     </style>
@@ -186,7 +222,11 @@
                 <label for="password">Password:</label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" required placeholder="Enter your password">
-                    <span class="password-toggle" onclick="togglePassword('password', this)">👁</span>
+                    <span class="password-toggle" onclick="togglePassword('password', this)">
+                        <svg class="eye-icon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </span>
                 </div>
                 <div class="error-message" id="loginError" {% if error %}style="display: block;"{% endif %}>
                     {% if error %}{{ error }}{% else %}Invalid email or password{% endif %}
@@ -205,10 +245,19 @@
         // Toggle password visibility
         function togglePassword(fieldId, toggleElement) {
             const passwordField = document.getElementById(fieldId);
+            const eyeIcon = toggleElement.querySelector('.eye-icon path');
             const isPassword = passwordField.type === 'password';
             
             passwordField.type = isPassword ? 'text' : 'password';
-            toggleElement.innerHTML = isPassword ? '<span style="position: relative;">👁<span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #f46464; font-size: 1.2em;">⃠</span></span>' : '👁';
+            
+            if (isPassword) {
+                // Change to "eye-off" icon
+                eyeIcon.setAttribute('d', 'M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92 1.41-1.41L3.51 2.3 2.1 3.71l2.21 2.21C3.06 6.81 1.77 9.26 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l2.31 2.31 1.41-1.41-2.28-2.28C18.54 16.5 19 14.79 19 13c0-.22-.02-.44-.05-.65l-1.91-1.91C17.36 11.18 17 12.54 17 12c0-2.76-2.24-5-5-5-.92 0-1.78.25-2.53.69L7.69 5.91C9.25 5.35 10.58 5 12 5z');
+            } else {
+                // Change back to "eye" icon
+                eyeIcon.setAttribute('d', 'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z');
+            }
+            
             toggleElement.classList.toggle('active');
         }
 

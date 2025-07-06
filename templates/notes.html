@@ -282,6 +282,12 @@
             outline: none;
         }
         
+        select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 10px;
+        }
+        
         input[type="text"]:focus,
         textarea:focus,
         select:focus {
@@ -675,6 +681,49 @@
 
         .edit-form-group {
             margin-bottom: 20px;
+        }
+
+        .edit-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .edit-form-group input[type="text"],
+        .edit-form-group textarea,
+        .edit-form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .edit-form-group select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 10px;
+        }
+
+        .edit-form-group input[type="text"]:focus,
+        .edit-form-group textarea:focus,
+        .edit-form-group select:focus {
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 4px rgba(244, 100, 100, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .edit-form-group textarea {
+            height: 120px;
+            resize: vertical;
+            line-height: 1.5;
         }
 
         .modal-buttons {
